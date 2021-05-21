@@ -1,20 +1,41 @@
-import React, { useState } from 'react';
-import data from './data';
-import List from './List';
+import React, { useState, useEffect } from 'react'
+import Loading from './Loading'
+import Tours from './Tours'
+// ATTENTION!!!!!!!!!!
+// I SWITCHED TO PERMANENT DOMAIN
+const url = 'https://course-api.com/react-tours-project'
 
 function App() {
 
-  const [people, setPeople] = useState(data);// The "people" from the array of objects in the  "data" component.  These "people"are passed in as a prop to the List component.
+  const [loading, setLoading] = useState(true);
+  const [tours,setTours] = useState([]);
 
-  return (
-    <main>
-    <section className="container">
-      <h3>{people.length} birthdays today</h3>
-      <List people={people}/>
-      <button onClick={() => setPeople([])}>clear all</button>
-    </section>
+  const fetchTours = async () => {
+    setLoading(true);
+
+    try {
+      const response = await fetch(url)
+      const tours = await response.json();
+      setLoading(false);
+      setTours(tours);
+    } catch(error) {
+        setLoading(false);
+        console.log(error);
+    }
+    
+    console.log(tours);
+  };
+useEffect(() => {
+  fetchTours();
+}, [])
+  if(loading === true) {// If the data from the api is still loading, display the Loading component
+    return <main>
+      <Loading />
+    </main>
+  }// If it is not still loading, display the Tours component.
+  return <main>
+    <Tours tours={tours}/>
   </main>
-    )
 }
 
-export default App;
+export default App
